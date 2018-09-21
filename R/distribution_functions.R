@@ -63,3 +63,27 @@ rmnorm <- function(mu, cov, prec) {
 }
 
 
+#' Multivariate Normal Density Function
+#'
+#' Computes the (log) density of the multivariate normal distribution
+#' using either the covariance or precision parametrization.
+#'
+#' @param y vector of values.
+#' @param mu mean vector.
+#' @param cov covariance matrix.
+#' @param prec precision matrix.
+#' @param log logical; if TRUE, density calculations are computed on the log scale.
+#' @export
+
+dmnorm <- function(y, mu, cov, prec, log = FALSE) {
+  if (!xor(missing(cov), missing(prec))) {
+    stop("Provide either cov or prec, but not both")
+  }
+  if(missing(prec)) prec <- chol2inv(chol(cov))
+
+  n <- length(y)
+  out <- -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE) - t(y - mu) %*% prec %*% (y - mu)
+
+  if (log == FALSE) out <- exp(out)
+  return(as.numeric(out))
+}
