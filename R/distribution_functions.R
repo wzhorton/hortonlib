@@ -1,5 +1,6 @@
 #### distribution_functions.R ####
 
+
 #' Inverse Gamma Density Function
 #'
 #' Computes the (log) density of the inverse gamma distribution using
@@ -19,14 +20,6 @@ dinvgamma <- function(x, shape, rate, scale = 1 / rate, log = FALSE) {
   if (!is.logical(log)) {
     stop("log needs to be logical")
   }
-  if(x == 0){
-    if(log == TRUE){
-      stop("x cannot be 0 if log is TRUE (negative infinity)")
-    }
-    else{
-      return(0)
-    }
-  }
 
   a <- shape
   b <- scale
@@ -36,10 +29,37 @@ dinvgamma <- function(x, shape, rate, scale = 1 / rate, log = FALSE) {
   else{
     out <- a * log(b) - lgamma(a) + (-a - 1) * log(x) - b / x
   }
-
   if (log == FALSE) out <- exp(out)
+
   return(out)
 }
 
+
+#' Random Multivariate Normal Generator
+#'
+#' Generates a normally distributed vector given a mean vector and
+#' either a covariance matrix or a precision matrix. Computationally, this method
+#' has an advantage since an inverse is never taken.
+#'
+#' @param mu mean vector.
+#' @param cov covariance matrix.
+#' @param prec precision matrix.
+#'
+#' @return A randomly generated vector with the same length as mu.
+#' @export
+
+rmnorm <- function(mu, cov, prec) {
+  if (missing(mu)) stop("Provide a mean vector")
+  if (!xor(missing(prec), missing(cov))) {
+    stop("Provide either Precision or Covariance, but not both")
+  }
+
+  if (missing(prec)) {
+    out <- mu + t(chol(cov)) %*% rnorm(length(mu))
+  } else {
+    out <- mu + backsolve(chol(prec), rnorm(length(mu)))
+  }
+  return(as.numeric(out))
+}
 
 
