@@ -50,3 +50,42 @@ update_normal_normal <- function(y, X, mu, Sig, V, Sig_inv, V_inv) {
   vterm <- chol2inv(chol(vv))
   return(rmnorm(vterm %*% (t(X) %*% (Sig_inv %*% y) + V_inv %*% mu), prec = vv))
 }
+
+
+#' Gaussian Process Update
+#'
+#' Updates and returns the mean vector for a gaussian process given evaluation points,
+#' observed data, a mean function, and a covariance function.\cr \cr
+#' Argument model:\cr
+#' y(time) ~ GP(mnfun(x),covfun(x1-x2))
+#'
+#' @param x,y coordinate vectors for the observed data points.
+#' @param time locations to evaluate the curve at.
+#' @param mnfun mean function that takes a single argument.
+#'   If using a constant like 0 use function(z)\{0\}.
+#' @param covfun covariance function that takes a single argument that represents
+#'   an absolute distance. Distances are internally calculated using fields::rdist.
+#' @param random logical; FALSE will return the updated mean function.
+#'   TRUE will generate a random curve.
+#' @return a vector corresponding to the time variable that represents the updated
+#'   mean vector.
+#' @export
+
+update_gaussian_process <- function(x, y, time, mnfun, covfun, random = FALSE) {
+  R11 <- covfun(fields::rdist(time))
+  R12 <- covfun(fields::rdist(time, x))
+  R22 <- covfun(fields::rdist(x))
+  R22i <- chol2inv(chol(R22))
+  mu1 <- mnfun(time)
+  mu2 <- mnfun(x)
+  up_mean <- as.numeric(mu1 + R12 %*% (R22i %*% (y - mu2)))
+  up_var <- R11 - R12 %*% R22i %*% t(R12)
+  if(random == FALSE){
+    return(list(up_mean = up_mean, up_var = up_var))
+  } else {
+    return(rmnorm(up_mean, cov = up_var))
+  }
+}
+
+
+
