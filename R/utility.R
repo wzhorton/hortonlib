@@ -127,7 +127,6 @@ unstack <- function(x, inds, n){
   }
 
   inds <- c(inds, nr + 1)
-
   return(lapply(1:(length(inds)-1), function(i) x[inds[i]:(inds[i+1] - 1),]))
 }
 
