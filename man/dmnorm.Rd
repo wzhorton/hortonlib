@@ -4,7 +4,7 @@
 \alias{dmnorm}
 \title{Multivariate Normal Density Function}
 \usage{
-dmnorm(y, mu, cov, prec, log = FALSE)
+dmnorm(y, mu, cov, prec, log = FALSE, unnorm = FALSE)
 }
 \arguments{
 \item{y}{vector of values.}
@@ -16,6 +16,8 @@ dmnorm(y, mu, cov, prec, log = FALSE)
 \item{prec}{precision matrix.}
 
 \item{log}{logical; if TRUE, density calculations are computed on the log scale.}
+
+\item{unnorm}{logical; if TRUE then only density terms dependent on y are calculated}
 }
 \description{
 Computes the (log) density of the multivariate normal distribution

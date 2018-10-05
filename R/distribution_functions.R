@@ -73,16 +73,18 @@ rmnorm <- function(mu, cov, prec) {
 #' @param cov covariance matrix.
 #' @param prec precision matrix.
 #' @param log logical; if TRUE, density calculations are computed on the log scale.
+#' @param unnorm logical; if TRUE then only density terms dependent on y are calculated
 #' @export
 
-dmnorm <- function(y, mu, cov, prec, log = FALSE) {
+dmnorm <- function(y, mu, cov, prec, log = FALSE, unnorm = FALSE) {
   if (!xor(missing(cov), missing(prec))) {
     stop("Provide either cov or prec, but not both")
   }
   if(missing(prec)) prec <- chol2inv(chol(cov))
 
   n <- length(y)
-  out <- -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE) - t(y - mu) %*% prec %*% (y - mu)
+  out <- - .5 * t(y - mu) %*% prec %*% (y - mu)
+  if(unnorm == FALSE) out <- out + -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE)
 
   if (log == FALSE) out <- exp(out)
   return(as.numeric(out))
