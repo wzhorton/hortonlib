@@ -84,7 +84,13 @@ dmnorm <- function(y, mu, cov, prec, log = FALSE, unnorm = FALSE) {
 
   n <- length(y)
   out <- - .5 * t(y - mu) %*% prec %*% (y - mu)
-  if(unnorm == FALSE) out <- out + -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE)
+  if(unnorm == FALSE){
+    if(!missing(cov)){
+      out <- out + -n/2 * log(2*pi) - .5 * det_spd(cov, log = TRUE)
+    } else {
+      out <- out + -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE)
+    }
+  }
 
   if (log == FALSE) out <- exp(out)
   return(as.numeric(out))
