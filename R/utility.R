@@ -93,3 +93,32 @@ sqrt_eigen <- function(x, symmetric = FALSE) {
   D <- diag(eig$values)
   return(C %*% D^(.5) %*% t(C))
 }
+
+#' Check is vector is monotone
+#'
+#' Determines if the sequence of vector elements are increasing or decreasing with the option to
+#' specify strictness.
+#'
+#' @param x numeric vector
+#' @param strict logical; if true then strict monotonicity is determined
+#' @export
+
+is_monotone <- function(x, strict){
+  ds <- diff(x)
+  if(all(ds > 0) || all(ds < 0)){
+    return(TRUE)
+  }
+  else {
+    if(strict == FALSE) {
+      if(all(ds >= 0) || all(ds <= 0)){
+        return(TRUE)
+      }
+      else {
+        return(FALSE)
+      }
+    }
+    else {
+      return(FALSE)
+    }
+  }
+}
