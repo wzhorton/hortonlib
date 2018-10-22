@@ -87,7 +87,7 @@ unstack <- function(x, inds, n){
 #' @param symmetric logical; indicates to eigen if x is symmetric
 #' @export
 
-sqrt.eigen <- function(x, symmetric = FALSE) {
+sqrt_eigen <- function(x, symmetric = FALSE) {
   eig <- eigen(x, symmetric)
   C <- eig$vectors
   D <- diag(eig$values)
