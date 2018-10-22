@@ -1,7 +1,7 @@
 Package: hortonlib
 Type: Package
 Title: Collection of Useful Functions
-Version: 0.1.3
+Version: 0.1.4
 Date: 2018-09-21
 Author: Zach Horton
 Maintainer: Same <example@email.com>

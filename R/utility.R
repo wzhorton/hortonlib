@@ -79,4 +79,17 @@ unstack <- function(x, inds, n){
   return(lapply(1:(length(inds)-1), function(i) x[inds[i]:(inds[i+1] - 1),]))
 }
 
+#' Square Root Matrix using Eigen Values/Vectors
+#'
+#' Compute a square root matrix using the eigenvalue/vector spectral decomposition.
+#'
+#' @param x semi-positive definite matrix
+#' @param symmetric logical; indicates to eigen if x is symmetric
+#' @export
 
+sqrt.eigen <- function(x, symmetric = FALSE) {
+  eig <- eigen(x, symmetric)
+  C <- eig$vectors
+  D <- diag(eig$values)
+  return(C %*% D^(.5) %*% t(C))
+}
