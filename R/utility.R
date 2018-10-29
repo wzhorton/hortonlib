@@ -122,3 +122,46 @@ is_monotone <- function(x, strict){
     }
   }
 }
+
+#' Project a vector into monotone space
+#'
+#' Makes a vector monotone. (REFERENCE) proposed a method to project a vector onto monotone space.
+#'
+#' @param x non-empty numeric vector
+#' @param type character indicating if the function is increasing or decreasing
+#' @param forced numeric vector of indeces specifying points that cannot be moved
+#' @export
+
+monotonize <- function(x, type = "increasing", forced = NULL){
+  n <- length(x)
+
+  if(type == "increasing"){
+    x <- x
+  } else if(type == "decreasing"){
+    x <- rev(x)
+  } else {
+    stop("Type must either be 'increasing' or 'decreasing'")
+  }
+
+  for(i in 2:n){
+    if(x[i] < x[i-1]){
+      j <- 1
+      lagmean <- lagsum <- x[i]
+      while(x[i-j] > lagmean){
+        lagsum <- lagsum + x[i-j]
+        j <- j + 1
+        lagmean <- lagsum/j
+        forced_check <- na.omit(match(((i-j+1):i), forced))
+        if(length(forced_check) != 0){
+          if(length(forced_check) != 1) {stop("SERIOUS ISSUES")}
+          lagmean <- x[forced[forced_check]]
+          lagsum <- j*lagmean
+        }
+      }
+      x[(i-j+1):i] <- lagmean
+    }
+  }
+
+  if(type == "increasing") return(x)
+  if(type == "decreasing") return(rev(x))
+}
