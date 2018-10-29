@@ -157,6 +157,7 @@ monotonize <- function(x, type = "increasing", forced = NULL){
           lagmean <- x[forced[forced_check]]
           lagsum <- j*lagmean
         }
+        if(i == j) break
       }
       x[(i-j+1):i] <- lagmean
     }
