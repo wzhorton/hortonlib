@@ -20,7 +20,7 @@ update_normal_invgamma <- function(y, a, b, mu, R, R_inv) {
   if (!xor(missing(R), missing(R_inv))) stop("Provide either R or R_inv, but not both")
   if (missing(R_inv)) R_inv <- chol2inv(chol(R))
   return(1 / rgamma(1, .5 * length(y) + a,
-                    scale = .5 * t(y - mu) %*% R_inv %*% (y - mu) + b))
+                    rate = .5 * t(y - mu) %*% R_inv %*% (y - mu) + b))
 }
 
 
