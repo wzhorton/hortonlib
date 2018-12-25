@@ -14,8 +14,8 @@
 #' @export
 
 dinvgamma <- function(x, shape, rate, scale = 1 / rate, log = FALSE) {
-  if (shape <= 0 || scale <= 0 || x < 0) {
-    stop("Shape, rate, scale, and x must all be positive")
+  if (any(shape <= 0) || any(scale <= 0)) {
+    stop("Shape and rate/scale must be positive")
   }
   if (!is.logical(log)) {
     stop("log needs to be logical")
@@ -23,12 +23,9 @@ dinvgamma <- function(x, shape, rate, scale = 1 / rate, log = FALSE) {
 
   a <- shape
   b <- scale
-  if(x == 0){
-    out <- 0
-  }
-  else{
-    out <- a * log(b) - lgamma(a) + (-a - 1) * log(x) - b / x
-  }
+  out <- a * log(b) - lgamma(a) + (-a - 1) * log(x) - b / x
+  out[is.nan(out)] <- -Inf
+
   if (log == FALSE) out <- exp(out)
 
   return(out)
@@ -49,17 +46,14 @@ dinvgamma <- function(x, shape, rate, scale = 1 / rate, log = FALSE) {
 #' @export
 
 rmnorm <- function(mu, cov, prec) {
-  if (missing(mu)) stop("Provide a mean vector")
-  if (!xor(missing(prec), missing(cov))) {
-    stop("Provide either Precision or Covariance, but not both")
+  if(missing(prec)) {
+    cov <- format_Matrix(cov, sparse = TRUE, symmetric = TRUE)
+    return(as.numeric(mu + crossprod(chol(cov), rnorm(ncol(cov)))))
+  } else if(missing(cov)) {
+    prec <- format_Matrix(prec, sparse = TRUE, symmetric = TRUE)
+    return(as.numeric(mu + solve(chol(prec), rnorm(ncol(prec)))))
   }
-
-  if (missing(prec)) {
-    out <- mu + t(chol(cov)) %*% rnorm(length(mu))
-  } else {
-    out <- mu + backsolve(chol(prec), rnorm(length(mu)))
-  }
-  return(as.numeric(out))
+  stop("Provide either Precision or Covariance, but not both")
 }
 
 
@@ -77,12 +71,17 @@ rmnorm <- function(mu, cov, prec) {
 #' @export
 
 dmnorm <- function(y, mu, cov, prec, log = FALSE, unnorm = FALSE) {
-  if (!xor(missing(cov), missing(prec))) {
+
+  if(missing(prec)) {
+    cov <- format_Matrix(cov, sparse = TRUE, symmetric = TRUE)
+    prec <- chol2inv(chol(cov))
+  } else if(missing(cov)) {
+    prec <- format_Matrix(prec, sparse = TRUE, symmetric = TRUE)
+  } else {
     stop("Provide either cov or prec, but not both")
   }
-  if(missing(prec)) prec <- chol2inv(chol(cov))
 
-  n <- length(y)
+  n <- ncol(prec)
   out <- - .5 * t(y - mu) %*% prec %*% (y - mu)
   if(unnorm == FALSE){
     if(!missing(cov)){

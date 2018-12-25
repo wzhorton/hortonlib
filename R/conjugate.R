@@ -17,10 +17,16 @@
 #' @export
 
 update_normal_invgamma <- function(y, a, b, mu, R, R_inv) {
-  if (!xor(missing(R), missing(R_inv))) stop("Provide either R or R_inv, but not both")
-  if (missing(R_inv)) R_inv <- chol2inv(chol(R))
-  return(1 / rgamma(1, .5 * length(y) + a,
-                    rate = .5 * t(y - mu) %*% R_inv %*% (y - mu) + b))
+  if(missing(R)){
+    R_inv <- format_Matrix(R_inv, sparse = TRUE, symmetric = TRUE)
+    qf <- qform(y - mu, R_inv)
+  } else if(missing(R_inv)) {
+    R <- format_Matrix(R, sparse = TRUE, symmetric = TRUE)
+    qf <- crossprod(solve(chol(R), y - mu))
+  } else {
+    stop("Provide either R or R_inv, but not both")
+  }
+  return(1 / rgamma(1, .5 * length(y) + a, rate = as.numeric(.5 * qf + b)))
 }
 
 
@@ -39,14 +45,27 @@ update_normal_invgamma <- function(y, a, b, mu, R, R_inv) {
 #' @export
 
 update_normal_normal <- function(y, X, mu, Sig, V, Sig_inv, V_inv) {
-  if (!xor(missing(Sig), missing(Sig_inv))) {
+  if(missing(Sig_inv)){
+    Sig <- format_Matrix(Sig, sparse = TRUE, symmetric = TRUE)
+    Sig_inv <- chol2inv(chol(Sig))
+  } else if(missing(Sig)){
+    Sig_inv <- format_Matrix(Sig_inv, sparse = TRUE, symmetric = TRUE)
+  } else {
     stop("Provide either Sig or Sig_inv, but not both")
   }
-  if (!xor(missing(V), missing(V_inv))) stop("Provide either V or V_inv, but not both")
-  if (missing(Sig_inv)) Sig_inv <- chol2inv(chol(Sig))
-  if (missing(V_inv)) V_inv <- chol2inv(chol(V))
 
-  vv <- t(X) %*% Sig_inv %*% X + V_inv
+  if(missing(V_inv)){
+    V <- format_Matrix(V, sparse = TRUE, symmetric = TRUE)
+    V_inv <- chol2inv(chol(V))
+  } else if(missing(V)){
+    V_inv <- format_Matrix(V_inv, sparse = TRUE, symmetric = TRUE)
+  } else {
+    stop("Provide either V or V_inv, but not both")
+  }
+
+  X <- format_Matrix(X, sparse = TRUE)
+
+  vv <- qform(X, Sig_inv) + V_inv
   vterm <- chol2inv(chol(vv))
   return(rmnorm(vterm %*% (t(X) %*% (Sig_inv %*% y) + V_inv %*% mu), prec = vv))
 }
@@ -72,16 +91,21 @@ update_normal_normal <- function(y, X, mu, Sig, V, Sig_inv, V_inv) {
 #' @export
 
 update_gaussian_process <- function(x, y, time, mnfun, covfun, random = FALSE) {
-  R11 <- covfun(fields::rdist(time))
-  R12 <- covfun(fields::rdist(time, x))
-  R22 <- covfun(fields::rdist(x))
+  R <- format_Matrix(covfun(fields::rdist(c(time,x))), sparse = TRUE, symmetric = TRUE)
+  m <- length(time)
+  f <- length(x)
+
+  R11 <- R[1:m,1:m]
+  R22 <- R[(m+1):(m+f),(m+1):(m+f)]
   R22i <- chol2inv(chol(R22))
+  R12 <- R[1:m,(m+1):(m+f)]
+
   mu1 <- mnfun(time)
   mu2 <- mnfun(x)
   up_mean <- as.numeric(mu1 + R12 %*% (R22i %*% (y - mu2)))
-  up_var <- R11 - R12 %*% R22i %*% t(R12)
+  up_var <- R11 - R12 %*% tcrossprod(R22i, R12)
   if(random == FALSE){
-    return(list(up_mean = up_mean, up_var = up_var))
+    return(list(up_mean = up_mean, up_var = as.matrix(up_var)))
   } else {
     return(rmnorm(up_mean, cov = up_var))
   }

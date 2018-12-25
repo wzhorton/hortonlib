@@ -1,16 +1,16 @@
 Package: hortonlib
 Type: Package
 Title: Collection of Useful Functions
-Version: 0.1.5
+Version: 0.2.0
 Date: 2018-09-21
 Author: Zach Horton
 Maintainer: Same <example@email.com>
 Description: A collection of functions that I have found very useful in my practice. 
     Among them are conjugate update functions for bayesian analysis, as well as
-    functions for subject specific object management.
+    functions for subject specific object management. These depend heavily on the
+    Matrix package for massive speed increases.
 License: MIT
-Depends: R (>= 3.4.0)
-Imports: Matrix (>= 1.2-13)
+Depends: R (>= 3.4.0), Matrix(>= 1.2-13)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

@@ -1,5 +1,32 @@
 #### utility.R ####
 
+#' Imbue Matrix With Property Classes
+#'
+#' Gives a matrix classes such as sparseness and symmetry from the Matrix package. Note that
+#' a matrix cannot be both symmetric and triangular unless it is diagonal.
+#'
+#' @param x a matrix with (or without) zero values
+#' @param sparse logical; gives class sparseMatrix and is almost always true.
+#' @param symmetric logical; gives class symmetricMatrix
+#' @param triangular logical; gives class triangularMatrix
+#' @param diagonal logical; gives class diagonalMatrix
+#' @export
+
+format_Matrix <- function(x, sparse = TRUE, symmetric = FALSE, triangular = FALSE, diagonal = FALSE){
+  if(sparse && !is(x, "sparseMatrix")){
+    x <- as(x, "sparseMatrix")
+  }
+  if(symmetric && !is(x, "symmetricMatrix")){
+    x <- as(x, "symmetricMatrix")
+  }
+  if(triangular && !is(x, "triangularMatrix")){
+    x <- as(x, "triangularMatrix")
+  }
+  if(diagonal && !is(x, "diagonalMatrix")){
+    x <- as(x, "diagonalMatrix")
+  }
+  return(x)
+}
 
 #' Determinant of Symmetric Positive Definite Matrix
 #'
@@ -11,11 +38,32 @@
 #' @export
 
 det_spd <- function(x, log = FALSE){
+  x <- format_Matrix(x, sparse = TRUE, symmetric = TRUE)
   out <- 2 * sum(log(diag(chol(x))))
   if(log == FALSE) out <- exp(out)
   return(out)
 }
 
+#' Efficient Computation of Quadratic Form
+#'
+#' Evaluates the quadratic form x'Ax using optimized cross products.
+#' An upper triangular matrix with U'U = A can also be given to dramatically increase speed.
+#'
+#' @param x a vector
+#' @param A a matrix. Only one of A and U needs to be provided.
+#' @param U an upper triangular matrix. Note that plugging in chol(A) is slower.
+#' @export
+
+qform <- function(x, A, U){
+  if(missing(A)){
+    U <- format_Matrix(U, sparse = TRUE, triangular = TRUE)
+    return(crossprod(U %*% x))
+  } else if(missing (U)) {
+    A <- format_Matrix(A, sparse = TRUE)
+    return(crossprod(crossprod(A,x),x))
+  }
+  stop("Provide either A or U but not both")
+}
 
 #' Acceptance Rate Calculator
 #'
@@ -25,9 +73,7 @@ det_spd <- function(x, log = FALSE){
 #' @export
 
 acc_rate <- function(chain) {
-  n <- length(chain)
-  accepts <- sapply(1:(n - 1), function(i) chain[i] != chain[i + 1])
-  return(mean(accepts))
+  return(1 - mean(diff(chain) == 0))
 }
 
 
