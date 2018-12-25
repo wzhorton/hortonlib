@@ -13,6 +13,9 @@
 #' @export
 
 format_Matrix <- function(x, sparse = TRUE, symmetric = FALSE, triangular = FALSE, diagonal = FALSE){
+  if(any(c(sparse, symmetric, triangular, diagonal))){
+    x <- as.matrix(x)
+  }
   if(sparse && !is(x, "sparseMatrix")){
     x <- as(x, "sparseMatrix")
   }
