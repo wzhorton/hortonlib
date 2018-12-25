@@ -38,6 +38,7 @@ format_Matrix <- function(x, sparse = TRUE, symmetric = FALSE, triangular = FALS
 #'
 #' @param x square matrix
 #' @param log logical; defaults to FALSE
+#' @import Matrix
 #' @importFrom Matrix chol diag
 #' @export
 
@@ -242,7 +243,7 @@ monotonize <- function(x, type = "increasing", forced = NULL){
 bdiag_m <- function(lmat) {
   ## Copyright (C) 2016 Martin Maechler, ETH Zurich
   if(!length(lmat)) return(new("dgCMatrix"))
-  stopifnot(is.list(lmat), is.matrix(lmat[[1]]),
+  stopifnot(is.list(lmat), #is.matrix(lmat[[1]]),
             (k <- (d <- dim(lmat[[1]]))[1]) == d[2], # k x k
             all(vapply(lmat, dim, integer(2)) == k)) # all of them
   N <- length(lmat)
