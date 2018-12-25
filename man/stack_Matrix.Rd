@@ -6,11 +6,10 @@
 \usage{
 stack_Matrix(x)
 }
+\arguments{
+\item{x}{list of matrices.}
+}
 \description{
 Stack a list of matrices together into one tall matrix. This is a simplified version of the
 stack function. It quickly stacks matrices and gives the result sparseMatrix class.
-}
-\details{
-@param x list of matrices.
- @export
 }
