@@ -38,6 +38,7 @@ format_Matrix <- function(x, sparse = TRUE, symmetric = FALSE, triangular = FALS
 #'
 #' @param x square matrix
 #' @param log logical; defaults to FALSE
+#' @importFrom Matrix chol diag
 #' @export
 
 det_spd <- function(x, log = FALSE){
@@ -55,6 +56,7 @@ det_spd <- function(x, log = FALSE){
 #' @param x a vector
 #' @param A a matrix. Only one of A and U needs to be provided.
 #' @param U an upper triangular matrix. Note that plugging in chol(A) is slower.
+#' @importFrom Matrix crossprod solve
 #' @export
 
 qform <- function(x, A, U){
