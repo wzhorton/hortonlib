@@ -99,6 +99,18 @@ stack <- function(x){
   return(out)
 }
 
+#' Stack A List of Matrices
+#'
+#' Stack a list of matrices together into one tall matrix. This is a simplified version of the
+#' stack function. It quickly stacks matrices and gives the result sparseMatrix class.
+#'
+#'  @param x list of matrices.
+#'  @export
+
+stack_Matrix <- function(x){
+  out <- do.call(rbind, x)
+  return(format_Matrix(out, sparse = TRUE))
+}
 
 #' Unstack a Vector or Matrix
 #'
