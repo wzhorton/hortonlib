@@ -1,0 +1,7 @@
+hortonlib - Dec 2018
+
+hortonlib is an R package containing a variety of useful functions I have currated over the years. Recently I discovered the power of the Matrix package. I reformatted a large portion of code to capitalize on sparse matrix operations. Later I discovered that the real advantage of the Matrix package classes was size, not speed (although diagonal matrix operations are indeed faster).
+
+I attempted to revert portions of the code while at the same time trying to implement speed boosts using Rcpp, an endeavor that started with the RAMSES package. In the process, I realized that the infrastructure needed to implement that did not exist and was going to require a lot of modification. I knew that a total overhaul was needed. However, the adaptations I made are obsolete yet valuable for an example.
+
+In the interest of preservation and simplification, I am archiving this repository. I will continue this project in the ztools package. The last few commits are full of incomplete and nonfunctional code, a sure sign that I was in the middle of making changes when I made this decision. Many of the functions found in both hortonlib and ramses can be found either copied or modified in ztools.

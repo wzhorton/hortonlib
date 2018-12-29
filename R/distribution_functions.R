@@ -57,40 +57,40 @@ rmnorm <- function(mu, cov, prec) {
 }
 
 
-#' Multivariate Normal Density Function
-#'
-#' Computes the (log) density of the multivariate normal distribution
-#' using either the covariance or precision parametrization.
-#'
-#' @param y vector of values.
-#' @param mu mean vector.
-#' @param cov covariance matrix.
-#' @param prec precision matrix.
-#' @param log logical; if TRUE, density calculations are computed on the log scale.
-#' @param unnorm logical; if TRUE then only density terms dependent on y are calculated
-#' @export
-
-dmnorm <- function(y, mu, cov, prec, log = FALSE, unnorm = FALSE) {
-
-  if(missing(prec)) {
-    cov <- format_Matrix(cov, sparse = TRUE, symmetric = TRUE)
-    prec <- chol2inv(chol(cov))
-  } else if(missing(cov)) {
-    prec <- format_Matrix(prec, sparse = TRUE, symmetric = TRUE)
-  } else {
-    stop("Provide either cov or prec, but not both")
-  }
-
-  n <- ncol(prec)
-  out <- - .5 * t(y - mu) %*% prec %*% (y - mu)
-  if(unnorm == FALSE){
-    if(!missing(cov)){
-      out <- out + -n/2 * log(2*pi) - .5 * det_spd(cov, log = TRUE)
-    } else {
-      out <- out + -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE)
-    }
-  }
-
-  if (log == FALSE) out <- exp(out)
-  return(as.numeric(out))
-}
+# #' Multivariate Normal Density Function
+# #'
+# #' Computes the (log) density of the multivariate normal distribution
+# #' using either the covariance or precision parametrization.
+# #'
+# #' @param y vector of values.
+# #' @param mu mean vector.
+# #' @param cov covariance matrix.
+# #' @param prec precision matrix.
+# #' @param log logical; if TRUE, density calculations are computed on the log scale.
+# #' @param unnorm logical; if TRUE then only density terms dependent on y are calculated
+# #' @export
+#
+# dmnorm <- function(y, mu, cov, prec, log = FALSE, unnorm = FALSE) {
+#
+#   if(missing(prec)) {
+#     cov <- format_Matrix(cov, sparse = TRUE, symmetric = TRUE)
+#     prec <- chol2inv(chol(cov))
+#   } else if(missing(cov)) {
+#     prec <- format_Matrix(prec, sparse = TRUE, symmetric = TRUE)
+#   } else {
+#     stop("Provide either cov or prec, but not both")
+#   }
+#
+#   n <- ncol(prec)
+#   out <- - .5 * t(y - mu) %*% prec %*% (y - mu)
+#   if(unnorm == FALSE){
+#     if(!missing(cov)){
+#       out <- out + -n/2 * log(2*pi) - .5 * det_spd(cov, log = TRUE)
+#     } else {
+#       out <- out + -n/2 * log(2*pi) + .5 * det_spd(prec, log = TRUE)
+#     }
+#   }
+#
+#   if (log == FALSE) out <- exp(out)
+#   return(as.numeric(out))
+# }

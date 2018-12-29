@@ -9,8 +9,10 @@ Description: A collection of functions that I have found very useful in my pract
     Among them are conjugate update functions for bayesian analysis, as well as
     functions for subject specific object management. These depend heavily on the
     Matrix package for massive speed increases.
-License: MIT
-Depends: R (>= 3.4.0), Matrix(>= 1.2-13)
+License: GPL-3
+Depends: R (>= 3.4.0), Matrix(>= 1.2-13), Rcpp(>= 0.12.18)
+LinkingTo: Rcpp, RcppArmadillo
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
+
